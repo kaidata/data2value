@@ -1,6 +1,6 @@
 # data2value
 
-this project focus on <b>design & architecture[question & function]</b> in <b>large scale</b> data mining; include on:
+this project focus on <b>design & architecture[problem & solution]</b> in <b>large scale</b> data mining; include on:
 - data integration
   - multi-source heterogeneous
   - split\increase
