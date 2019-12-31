@@ -1,28 +1,49 @@
 # data2value
 
-this project focus on <b>design & architecture[question & function]</b> in <b>large scale</b> data mining; include on:
-- data integration
-  - multi-source heterogeneous
-  - split\increase
-- data exploration
-  - data quality
-  - data visualization
-  - data report
-- data storage
-- data processing
-- model serving
-  - data model
-  - algorithm model
+this project focus on <b>Design & Architecture[question & function]</b> in <b>Large Scale</B> Data Mining; include on:
+
+- Data Engineering
+	- Data Processing
+
+	- Data Integration
+
+	- Data Storage
+
+	- Data Modeling
+
+	- Data Exploration
 
 
-## data integration
+- Data Mining 
+	- large scale machine learning
+	- data mining platforming
 
-## data storage
 
-## data processing
+# Data Engineering
 
-## data exploration
+## Data Integration
+  - Multi-Source Heterogeneous
+  - Split\Increase
 
-## model serving
+## Data Storage
+
+## Data Processing
+
+## Data Exploration
+  - Data Quality
+	- Rule Engine
+	- Unit Test
+  - Data Report
+	- Template Engine
+
+# Data Mining
+
+## Large Scale Machine Learning
+
+## Data Mining Platforming
+
+	- Model Serving
+	  - Data Model
+	  - Algorithm Model
 
 
