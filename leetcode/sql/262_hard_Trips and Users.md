@@ -21,6 +21,3 @@ FROM (
 ) c
 GROUP BY c.Request_at
 ```
-
-
-
