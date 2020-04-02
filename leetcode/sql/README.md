@@ -1,0 +1,20 @@
+- 185_hard_Department Top Three Salaries
+  - done
+- 262_hard_Trips and Users
+  - done
+- 569_hard_Median Employee Salary
+  - 
+- 571_hard_Find Median Given Frequency of Numbers
+- 579_hard_Find Cumulative Salary of an Employee
+- 601_hard_Human Traffic of Stadium
+  - done
+- 615_hard_Average Salary Departments VS Company
+- 618_hard_Students Report By Geography
+- 1097_hard_Game Play Analysis V
+- 1127_hard_User Purchase Platform
+- 1159_hard_Market Analysis II
+- 1194_hard_Tournament Winners
+- 1225_hard_Report Contiguous Dates
+- 1336_hard_Number of Transactions per Visit
+- 1369_hard_Get the Second Most Recent Activity
+- 1384_hard_Total Sales Amount by Year
