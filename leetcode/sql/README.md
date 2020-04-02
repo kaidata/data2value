@@ -3,7 +3,6 @@
 - 262_hard_Trips and Users
   - done
 - 569_hard_Median Employee Salary
-  - 
 - 571_hard_Find Median Given Frequency of Numbers
 - 579_hard_Find Cumulative Salary of an Employee
 - 601_hard_Human Traffic of Stadium
