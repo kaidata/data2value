@@ -1,5 +1,51 @@
-- rank over partition by Id order by Month desc month_desc, month_desc != 1; exclude the most recent month
-- inner join on Id = Id and Month <= Month
+- 
+
+```scala
+package com.chaosdata.spark
+
+import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.expressions.Window
+import org.apache.spark.sql.functions._
+
+object FindCumulativeSalary {
+  def main(args: Array[String]): Unit = {
+
+    val spark = SparkSession
+      .builder()
+      .appName("having window lag")
+      .master("local")
+      .getOrCreate()
+
+    import spark.implicits._
+    val df = "1\t1\t20\n2\t1\t20\n1\t2\t30\n2\t2\t30\n3\t2\t40\n1\t3\t40\n3\t3\t60\n1\t4\t60\n3\t4\t70"
+      .split("\n").map(line => {
+      val arr = line.split("\t")
+
+      (arr(0).toInt, arr(1).toInt, arr(2).toInt)
+    }).toSeq.toDF("id", "month", "salary")
+
+    df.show()
+
+    val res = df.withColumn("rn", row_number().over(Window.partitionBy("id").orderBy(desc("month"))))
+      .filter("rn>1 and rn<5")
+
+    val res_ = res.withColumnRenamed("id", "id_")
+      .withColumnRenamed("month", "month_")
+      .withColumnRenamed("salary", "salary_")
+
+    val resultDF = res.join(res_, $"id" === $"id_" and $"month" >= $"month_", "outer")
+      .groupBy("id", "month").agg(sum("salary_").alias("cumulativeSalary"))
+      .orderBy(asc("id"), desc("month"))
+
+    resultDF.show()
+
+    spark.stop()
+  }
+}
+
+```
+
+
 
 
 

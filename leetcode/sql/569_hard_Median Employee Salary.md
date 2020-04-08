@@ -1,8 +1,38 @@
 - row_num over partition by Company order by Salary as rownum
 - count(1) over group by Company as total_count
-- rownum 
+- rn >= ceil(max_rownum / 2) and rn <= (max_rownum / 2) + 1
 
-```sql
+```scala
+package com.chaosdata.spark
+
+import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.expressions.Window
+import org.apache.spark.sql.functions._
+
+object MedianEmployeeSalary {
+  def main(args: Array[String]): Unit = {
+    val spark = SparkSession
+      .builder()
+      .appName("having window lag")
+      .master("local")
+      .getOrCreate()
+
+    val df = spark.read.option("header", true).csv("E:\\workspace\\SwordOffer-master\\src\\main\\resources\\employee.csv")
+      .select("department_code", "salaries").withColumn("id", monotonically_increasing_id())
+
+    val rowNumDF = df.withColumn("rn", row_number().over(Window.partitionBy("department_code").orderBy("salaries")))
+
+    val depEmployeeCount = rowNumDF.groupBy("department_code").agg(max("rn").alias("max_rownum"))
+    depEmployeeCount.show()
+
+    val res = rowNumDF.join(depEmployeeCount, "department_code").filter("rn >= ceil(max_rownum / 2) and rn <= (max_rownum / 2) + 1")
+
+    res.show()
+
+    spark.stop()
+  }
+
+}
 
 ```
 

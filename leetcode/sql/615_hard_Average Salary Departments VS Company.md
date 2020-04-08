@@ -1,5 +1,48 @@
 - group by month, department_id; avg_dep_salary
 - group by month; avg_com_salary
+- join on month, case when then else
+
+
+
+'data bank salary'
+
+```scala
+package com.chaosdata.spark
+
+import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.functions._
+
+object AverageSalaryDepartmentsCompany {
+
+  def main(args: Array[String]): Unit = {
+    val spark = SparkSession
+      .builder()
+      .appName("having window lag")
+      .master("local")
+      .getOrCreate()
+
+    val df = spark.read.option("header", true).csv("E:\\workspace\\SwordOffer-master\\src\\main\\resources\\employee.csv")
+
+    val depAvg = df.groupBy("year", "department_code").agg(avg("salaries").alias("dep_avg_salary"))
+
+    val comAvg = df.groupBy("year").agg(avg("salaries").alias("com_avg_salary"))
+
+    val res = depAvg.join(comAvg, "year").selectExpr("year", "department_code", "dep_avg_salary", "com_avg_salary",
+      "(case " +
+        "when dep_avg_salary > com_avg_salary then 'higher' " +
+        "when dep_avg_salary < com_avg_salary then 'lower' " +
+        "else 'same' " +
+        "end) comparison").orderBy("year", "department_code")
+
+    res.show()
+
+    spark.stop()
+  }
+
+}
+```
+
+
 
 
 

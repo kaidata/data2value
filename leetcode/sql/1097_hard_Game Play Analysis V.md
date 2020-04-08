@@ -2,7 +2,8 @@
   - ROUND(TO_NUMBER(next_event_date - event_date)) = 1
 - install; first over partition by player_id order by event_date asc
 - inner join
-- 
+- installs; select player_id, device_id, first() over(partition by device_id order by event_date asc) as install_date from Activity
+- day1_retention; select  player_id, event_date, lead(event_date, 1, null) over(partition by player_id order by event_date asc ) as next_date from Activity where ROUND(TO_NUMBER(next_event_date - event_date)) = 1
 
 Table: `Activity`
 

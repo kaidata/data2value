@@ -3,14 +3,21 @@
 - 262_hard_Trips and Users
   - done
 - 569_hard_Median Employee Salary
+  - done
 - 571_hard_Find Median Given Frequency of Numbers
-- 579_hard_Find Cumulative Salary of an Employee
+  - done
+- 579_hard_Find Cumulative[累积的] Salary of an Employee
+  - done
 - 601_hard_Human Traffic of Stadium
   - done
 - 615_hard_Average Salary Departments VS Company
+  - done
 - 618_hard_Students Report By Geography
+  - done
 - 1097_hard_Game Play Analysis V
+  - done
 - 1127_hard_User Purchase Platform
+  - done
 - 1159_hard_Market Analysis II
 - 1194_hard_Tournament Winners
 - 1225_hard_Report Contiguous Dates

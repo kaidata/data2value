@@ -1,7 +1,11 @@
 - 177_Nth Highest Salary
+  - done
 - 178_Rank Scores
+  - done
 - 180_Consecutive Numbers
+  - done
 - 184_Department Highest Salary
+  - done
 - 534_Game Play Analysis III
 - 550_Game Play Analysis IV
 - 570_Managers with at Least 5 Direct Reports
@@ -14,6 +18,7 @@
 - 612_Shortest Distance in a Plane
 - 614_Second Degree Follower
 - 626_Exchange Seats
+  - done
 - 1045_Customers Who Bought All Products
 - 1070_Product Sales Analysis III
 - 1077_Project Employees III
