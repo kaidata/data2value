@@ -1,5 +1,81 @@
-- 分开处理，union
-- contiguous; how
+- contiguous
+  - lag
+  - lead
+- group
+  - rownum, rn_1
+  - filter uncondition record && rownum, rn_2
+  - group_id = rn_1 - rn_2
+
+
+
+- note(not recommend solution)
+  - join (day > day_)
+  - group by day, agg(set)
+    - set process
+
+
+
+```scala
+package com.chaosdata.spark
+
+import java.sql.Date
+
+import com.twitter.util.TimeFormat
+import org.apache.commons.lang3.StringUtils
+import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.expressions.Window
+import org.apache.spark.sql.functions._
+
+object ReportContiguousDates {
+
+  def main(args: Array[String]): Unit = {
+    val spark = SparkSession
+      .builder()
+      .appName("having window lag")
+      .master("local")
+      .getOrCreate()
+
+    val parseDateUDF = spark.udf.register("parseDate", (str: String) => {
+      new Date(new TimeFormat("yyyy/MM/dd").parse(str).inMilliseconds)
+    })
+
+    val parseBoolUDF = spark.udf.register("parseBool", (str: String) => {
+      StringUtils.equals(str, "TRUE")
+    })
+
+    val df = spark.read.option("header", true).csv("E:\\workspace\\SwordOffer-master\\src\\main\\resources\\taskStatus.csv")
+      .selectExpr("parseDate(date) as day", "parseBool(status) as success")
+    // rownum
+    val all = df.withColumn("rn_1", row_number().over(Window.orderBy(desc("day"))))
+
+    /**
+     * 求前面、后面的状态
+     */
+    val tmp = all
+      .withColumn("pre", lag("success", 1)
+        .over(Window.orderBy(desc("day"))))
+      .withColumn("aft", lead("success", 1)
+        .over(Window.orderBy(desc("day"))))
+      .select("day", "pre", "success", "aft", "rn_1")
+    tmp.show()
+
+    /**
+     * 过滤掉不连续的record, 并重新rownum
+     */
+    import spark.implicits._
+    val onlyContiguousDF = tmp.filter($"success" === $"pre" or $"success" === $"aft")
+      .withColumn("rn_2", row_number().over(Window.orderBy(desc("day"))))
+      .withColumn("group_id", $"rn_1" - $"rn_2")
+    onlyContiguousDF.show()
+
+    val result = onlyContiguousDF.groupBy("group_id", "success")
+      .agg(min("day").alias("start"), max("day").alias("end"))
+    result.show()
+
+    spark.stop()
+  }
+}
+```
 
 
 
