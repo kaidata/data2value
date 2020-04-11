@@ -1,6 +1,61 @@
-- second sold(join Items)
-- favorite brand
-- 
+
+
+```scala
+package com.chaosdata.spark
+
+import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.expressions.Window
+import org.apache.spark.sql.functions.{asc, desc, row_number, sum}
+
+object MarketAnalysisII {
+
+  def main(args: Array[String]): Unit = {
+    val spark = SparkSession
+      .builder()
+      .appName("having window lag")
+      .master("local")
+      .getOrCreate()
+
+    import spark.implicits._
+    val usersDF = "1\t2019-01-01\tLenovo\n2\t2019-02-09\tSamsung\n3\t2019-01-19\tLG\n4\t2019-05-21\tHP   "
+      .split("\n").map(line => {
+      val arr = line.split("\t")
+      (arr(0), arr(1), arr(2))
+    }).toSeq.toDF("user_id", "join_date", "favorite_brand")
+    val ordersDF = "1\t2019-08-01\t4\t1\t2\n2\t2019-08-02\t2\t1\t3\n3\t2019-08-03\t3\t2\t3\n4\t2019-08-04\t1\t4\t2\n5\t2019-08-04\t1\t3\t4\n6\t2019-08-05\t2\t2\t4"
+      .split("\n").map(line => {
+      val arr = line.split("\t")
+      (arr(0), arr(1), arr(2), arr(3), arr(4))
+    }).toSeq.toDF("order_id", "order_date", "item_id", "buyer_id", "seller_id")
+
+    val itemsDF = "1\tSamsung\n2\tLenovo\n3\tLG\n4\tHP"
+      .split("\n").map(line => {
+      val arr = line.split("\t")
+      (arr(0), arr(1))
+    }).toSeq.toDF("item_id", "item_brand")
+
+
+    val tmp = ordersDF.withColumn("rn",
+      row_number().over(Window.partitionBy("seller_id").orderBy(asc("order_date"))))
+      .filter("rn=2")
+      .join(itemsDF, "item_id")
+
+
+    val res = usersDF.join(tmp, $"user_id" === $"seller_id", "outer")
+      .selectExpr("user_id as seller_id", "case when (item_brand=favorite_brand and rn=2) then 'yes' else 'no' end as 2nd_item_fav_brand")
+      .orderBy("seller_id")
+
+    res.show()
+
+    spark.stop()
+  }
+
+}
+```
+
+
+
+
 
 Table: `Users`
 

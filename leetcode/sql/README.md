@@ -19,7 +19,7 @@
 - 1127_hard_User Purchase Platform
   - done
 - 1159_hard_Market Analysis II
-  - data
+  - done
 - 1194_hard_Tournament Winners
   - done
 - 1225_hard_Report Contiguous Dates
@@ -29,5 +29,5 @@
 - 1369_hard_Get the Second Most Recent Activity
   - done
 - 1384_hard_Total Sales Amount by Year
-  - data
+  - done
 

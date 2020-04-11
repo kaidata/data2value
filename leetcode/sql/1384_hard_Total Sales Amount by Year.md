@@ -1,5 +1,69 @@
-- cross year; to calc days every year
-- 
+```scala
+package com.chaosdata.spark
+
+import java.sql.Date
+import java.time.temporal.TemporalAdjusters.lastDayOfYear
+
+import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.functions._
+
+import scala.collection.mutable.ArrayBuffer
+
+object TotalSalesAmountYear {
+  def main(args: Array[String]): Unit = {
+    val spark = SparkSession
+      .builder()
+      .appName("having window lag")
+      .master("local")
+      .getOrCreate()
+
+    import spark.implicits._
+    val productDF = "1\tLC Phone\n2\tLC T-Shirt\n3\tLC Keychain"
+      .split("\n").map(line => {
+      val arr = line.split("\t")
+      (arr(0), arr(1))
+    }).toSeq.toDF("product_id", "product_name")
+    val salesDF = "1\t2019-01-25\t2019-02-28\t100\n2\t2018-12-01\t2020-01-01\t10\n3\t2019-12-01\t2020-01-31\t1"
+      .split("\n").map(line => {
+      val arr = line.split("\t")
+      (arr(0), arr(1), arr(2), arr(3))
+    }).toSeq.toDF("product_id", "period_start", "period_end", "average_daily_sales")
+
+    val timeRangeSplitUDF = spark.udf.register("timeRangeSplit", (startDate: Date, endDate: Date) => {
+      val buf = new ArrayBuffer[(Date, Date)]()
+      var tmpDate = startDate.toLocalDate
+      while (tmpDate.getYear != endDate.toLocalDate.getYear) {
+        buf.+=((Date.valueOf(tmpDate), Date.valueOf(tmpDate.`with`(lastDayOfYear()))))
+
+        tmpDate = tmpDate.`with`(lastDayOfYear()).plusDays(1)
+      }
+
+      buf.+=((Date.valueOf(tmpDate), endDate)).toArray
+    })
+
+
+    val tmp = salesDF.withColumn("timeRanges", timeRangeSplitUDF(col("period_start"), col("period_end")))
+      .withColumn("timeRange", explode($"timeRanges"))
+      .drop($"timeRanges")
+      .withColumn("days", datediff($"timeRange._2", $"timeRange._1").+(1))
+      .withColumn("total_amount", $"days".*($"average_daily_sales"))
+      .withColumn("report_year", year($"timeRange._1"))
+      .join(productDF, "product_id")
+      .select("product_id", "product_name", "report_year", "total_amount")
+      .orderBy(asc("product_id"), desc("product_name"))
+
+    tmp.show(false)
+    tmp.printSchema()
+
+    spark.stop()
+  }
+
+}
+```
+
+
+
+
 
 Table: `Product`
 
