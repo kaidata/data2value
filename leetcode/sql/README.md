@@ -25,7 +25,8 @@
 - 1225_hard_Report Contiguous Dates
   - done
 - 1336_hard_Number of Transactions per Visit
-  - data
+  - done [20200411]
+  - 序列生成
 - 1369_hard_Get the Second Most Recent Activity
   - done
 - 1384_hard_Total Sales Amount by Year

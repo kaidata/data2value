@@ -1,5 +1,58 @@
 
 
+```scala
+package com.chaosdata.spark
+
+import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.functions._
+
+object NumberTransactionsPerVisit {
+  def main(args: Array[String]): Unit = {
+    val spark = SparkSession
+      .builder()
+      .appName("NumberTransactionsPerVisit")
+      .master("local")
+      .getOrCreate()
+
+    import spark.implicits._
+    val visitDF = "1\t2020-01-01\n2\t2020-01-02\n12\t2020-01-01\n19\t2020-01-03\n1\t2020-01-02\n2\t2020-01-03\n1\t2020-01-04\n7\t2020-01-11\n9\t2020-01-25\n8\t2020-01-28"
+      .split("\n").map(line => {
+      val arr = line.split("\t")
+      (arr(0), arr(1))
+    }).toSeq.toDF("user_id", "visit_date")
+    val transactionsDF = "1\t2020-01-02\t120\n2\t2020-01-03\t22 \n7\t2020-01-11\t232\n1\t2020-01-04\t7  \n9\t2020-01-25\t33 \n9\t2020-01-25\t66 \n8\t2020-01-28\t1  \n9\t2020-01-25\t99 "
+      .split("\n").map(line => {
+      val arr = line.split("\t")
+      (arr(0), arr(1), arr(2))
+    }).toSeq.toDF("user_id", "transaction_date", "amount")
+
+    val visitStats = visitDF.groupBy("visit_date", "user_id").agg(count("*").alias("visits_count"))
+      .withColumnRenamed("user_id", "v_user_id")
+    val transStats = transactionsDF.groupBy("transaction_date", "user_id").agg(count("*").alias("trans_count"))
+      .withColumnRenamed("user_id", "t_user_id")
+
+    val tmp = visitStats.join(transStats, $"visit_date" === $"transaction_date" and $"v_user_id" === $"t_user_id", "outer")
+      .selectExpr("visits_count", "case when isNull(trans_count) then 0 else trans_count end as trans_count_")
+    tmp.cache()
+
+    val maxTransCount = tmp.agg(max("trans_count_")).head().getLong(0)
+    val transCountDF = (0L to maxTransCount).toDF("trans_count")
+
+    val transCountSerialDF = tmp.join(transCountDF, $"trans_count" === $"trans_count_", "outer")
+
+    val result = transCountSerialDF.groupBy("trans_count").agg(sum("visits_count").alias("visits_count"))
+      .selectExpr("trans_count", "case when isNull(visits_count) then 0 else visits_count end as visits_count")
+      .orderBy("trans_count")
+
+    result.show()
+
+    spark.stop()
+  }
+}
+```
+
+
+
 Table: `Visits`
 
 ```
