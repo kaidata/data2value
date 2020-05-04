@@ -1,0 +1,1 @@
+[link](https://sqlzoo.net/wiki/The_JOIN_operation)
